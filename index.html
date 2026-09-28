@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Online booking demo</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="demo">
+        <b>Demo</b><span>See this booking page as a:</span>
+        <span class="sw" id="brand-switch"></span>
+        <a class="admin-btn" href="admin/index-admin.html">Admin dashboard</a>
+    </div>
+
+    <header class="biz">
+        <div class="wrap">
+            <h1 id="biz-name"></h1>
+            <p id="biz-tag"></p>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <div>
+            <div id="steps">
+                <section class="card" id="step-service">
+                    <h2>Choose a service</h2>
+                    <div id="service-list"></div>
+                </section>
+
+                <section class="card" id="step-time" hidden>
+                    <h2>Pick a time</h2>
+                    <div class="week-nav">
+                        <button class="week-nav-btn" type="button" id="week-prev" aria-label="Previous week">&larr;</button>
+                        <span class="week-range" id="week-range"></span>
+                        <button class="week-nav-btn" type="button" id="week-next" aria-label="Next week">&rarr;</button>
+                    </div>
+                    <div class="days" id="day-list"></div>
+                    <p class="muted" id="day-hint">Choose a day to see open times.</p>
+                    <div class="slots" id="slot-list" hidden></div>
+                </section>
+
+                <section class="card" id="step-details" hidden>
+                    <h2>Your details</h2>
+                    <form id="details-form" novalidate>
+                        <div class="row">
+                            <label id="field-name">Full name <span class="opt-tag" id="tag-name" hidden>(optional)</span>
+                                <input id="f-name" autocomplete="name"></label>
+                            <label id="field-email">Email <span class="opt-tag" id="tag-email" hidden>(optional)</span>
+                                <input id="f-email" type="email" autocomplete="email"></label>
+                        </div>
+                        <div class="row">
+                            <label id="field-phone">Phone <span class="opt-tag" id="tag-phone" hidden>(optional)</span>
+                                <input id="f-phone" type="tel" autocomplete="tel"></label>
+                            <label id="field-address">Address <span class="opt-tag" id="tag-address" hidden>(optional)</span>
+                                <input id="f-address" autocomplete="street-address"></label>
+                        </div>
+                        <div id="custom-field-list"></div>
+                        <label>Anything we should know? (optional) <textarea id="f-note" rows="2"></textarea></label>
+                    </form>
+                </section>
+            </div>
+
+            <section class="card done" id="confirmation" hidden>
+                <div class="tick">✓</div>
+                <h2>You're booked in, <span id="conf-name"></span></h2>
+                <p id="conf-detail"></p>
+                <p class="muted">
+                    Reference <span id="conf-ref"></span>.<br>
+                    <span id="conf-email-line">A confirmation and reminder would go to <span
+                            id="conf-email"></span>.<br></span>
+                    This is a demo, so nothing was actually sent.
+                </p>
+                <button class="link" type="button" id="reset">Make another booking</button>
+            </section>
+        </div>
+
+        <aside class="card" id="summary">
+            <h2>Your booking</h2>
+            <dl>
+                <dt>Where</dt>
+                <dd><span id="sum-where"></span><br><span class="muted" id="sum-addr"></span></dd>
+                <dt>Service</dt>
+                <dd id="sum-service"></dd>
+                <dt>When</dt>
+                <dd id="sum-when"></dd>
+            </dl>
+            <div class="total"><span>Total</span><span id="sum-total"></span></div>
+            <p class="err" id="error" role="alert"></p>
+            <button class="cta" type="submit" form="details-form">Confirm booking</button>
+        </aside>
+    </main>
+
+    <!-- Templates for repeated items. script.js clones these. -->
+    <template id="tpl-brand"><button type="button"></button></template>
+
+    <template id="tpl-service">
+        <button class="svc" type="button">
+            <span><span class="svc-name"></span><small class="svc-desc"></small></span>
+            <span class="pr"></span>
+        </button>
+    </template>
+
+    <template id="tpl-day">
+        <button class="day" type="button"><small class="day-name"></small><span class="day-num"></span></button>
+    </template>
+
+    <template id="tpl-slot"><button class="slot" type="button"></button></template>
+
+    <template id="tpl-custom-text">
+        <label class="cf-field"><span class="cf-label"></span><span class="opt-tag cf-opt" hidden>(optional)</span>
+            <input class="cf-input" type="text"></label>
+    </template>
+
+    <template id="tpl-custom-textarea">
+        <label class="cf-field"><span class="cf-label"></span><span class="opt-tag cf-opt" hidden>(optional)</span>
+            <textarea class="cf-input" rows="2"></textarea></label>
+    </template>
+
+    <script src="shared.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
