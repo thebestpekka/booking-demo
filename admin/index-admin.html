@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Booking dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles-admin.css">
+</head>
+
+<body>
+
+    <div class="demo">
+        <b>Demo</b><span>See this dashboard as a:</span>
+        <span class="sw" id="brand-switch"></span>
+        <div class="demo-tools">
+            <button class="btn" type="button" id="add-samples">Add sample bookings</button>
+            <button class="btn" type="button" id="export-csv">Export CSV</button>
+            <button class="btn" type="button" id="clear">Clear bookings</button>
+            <a class="admin-btn" href="../index.html">Back to booking page</a>
+        </div>
+    </div>
+
+    <div class="admin-shell">
+        <nav class="admin-nav">
+            <strong id="nav-biz-name"></strong>
+            <button class="nav-btn" type="button" data-view="calendar" aria-pressed="true">Calendar</button>
+            <button class="nav-btn" type="button" data-view="analytics">Analytics</button>
+            <button class="nav-btn" type="button" data-view="editor">Booking page</button>
+            <button class="nav-btn" type="button" data-view="employees">Employees</button>
+        </nav>
+
+        <main class="admin-main">
+
+            <section id="view-calendar">
+                <div style="margin-left: 30px;">
+
+
+                    <div class="toolbar" style="margin-bottom: 0px;">
+                        <h1>Calendar</h1>
+                    </div>
+                    <div class="calendar-week-label" style="position: relative;">
+                        <button class="week-range-btn" type="button" id="week-range-btn">
+                            <span id="week-range" class="week-range" role="status"></span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+
+                        <!-- Hidden native date picker -->
+                        <input type="date" id="week-date-picker" class="hidden-date-picker">
+
+                        <button class="link week-today-link" type="button" id="week-today" hidden>Back to this
+                            week</button>
+                    </div>
+
+                    <p class="muted" id="empty" hidden>No bookings yet. Book a time on the customer page, or add sample
+                        bookings.</p>
+
+                    <div class="toolbar calendar-toolbar">
+                        <div class="search-bar cal-search-bar">
+                            <div class="search-input-wrap">
+                                <input type="search" id="cal-search" class="search-input" placeholder="Search bookings…"
+                                    aria-label="Search bookings">
+
+                                <div id="search-results" class="card search-results" hidden></div>
+                                <p class="muted" id="search-match-count" role="status"></p>
+
+                                <div class="search-options-wrap">
+                                    <button class="btn" type="button" id="search-options-btn" aria-haspopup="true"
+                                        aria-expanded="false">Fields</button>
+                                    <div id="search-options-menu" class="card search-options-menu" hidden>
+                                        <p class="muted search-options-title">Search in</p>
+
+                                        <label><input type="checkbox" class="search-field" value="name" checked>
+                                            Customer name</label>
+                                        <label><input type="checkbox" class="search-field" value="service" checked>
+                                            Service</label>
+                                        <label><input type="checkbox" class="search-field" value="staff" checked>
+                                            Staff</label>
+                                        <label><input type="checkbox" class="search-field" value="email" checked>
+                                            Email</label>
+                                        <label><input type="checkbox" class="search-field" value="phone" checked>
+                                            Phone</label>
+                                        <label><input type="checkbox" class="search-field" value="notes" checked>
+                                            Notes</label>
+                                        <label><input type="checkbox" class="search-field" value="ref" checked>
+                                            Reference</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="actions calendar-actions">
+                            <select id="color-mode" aria-label="Colour mode">
+                                <option value="job">Colour by job</option>
+                                <option value="employee">Colour by employee</option>
+                            </select>
+
+                            <button class="btn" type="button" id="auto-assign">Auto-assign staff</button>
+                        </div>
+                    </div>
+
+                    <!-- Separate Legend & Color Controls -->
+                    <div class="toolbar" style=" margin-bottom: 5px;">
+                        <div class="legend-box">
+                            <div id="calendar-legend" class="cal-legend"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div id="quick-color-menu" class="card" hidden>
+                    <h3>Edit service colours</h3>
+                    <div id="quick-color-list"></div>
+                    <div class="actions" style="margin-top: 12px;">
+                        <button class="cta" type="button" id="save-quick-colors"
+                            style="padding: 6px 12px; font-size: 13px; width: auto;">Save</button>
+                    </div>
+                </div>
+
+
+
+                <div class="calendar-layout">
+                    <div class="calendar-nav-wrap">
+                        <div class="calendar" id="calendar-grid"></div>
+                    </div>
+
+                    <!-- Side Panel (Replaces the old <dialog>) -->
+                    <aside id="booking-modal" class="card bm-collapsed">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                            <div style="min-width: 0;">
+                                <h2 id="bm-title" style="margin: 0;">Booking Details</h2>
+                                <p class="muted" id="bm-datetime-display" style="margin: 2px 0 0;"></p>
+                            </div>
+                            <button type="button" id="bm-close" class="emp-panel-popover-close" aria-label="Close"
+                                style="margin-left: 12px;">✕</button>
+                        </div>
+                        <p class="bm-past-notice" id="bm-past-notice" hidden>This booking is in a past week and is
+                            read-only.</p>
+
+                        <form id="bm-form">
+                            <input type="hidden" id="bm-ref">
+                            <input type="hidden" id="bm-date">
+                            <input type="hidden" id="bm-time">
+
+                            <!-- Customer-submitted details. Locked by default on an existing
+                                 booking (see openBookingModal() in script.js) and shown as a
+                                 plain formal summary rather than input boxes, with all four
+                                 fields grouped together here regardless of their order below.
+                                 "Unlock to edit" swaps this for the real, list-order fields. -->
+                            <div class="bm-locked-group">
+                                <div class="bm-view" id="bm-view" hidden>
+                                    <div class="bm-view-top">
+                                        <div>
+                                            <p class="bm-view-name" id="bm-view-name"></p>
+                                            <p class="bm-view-service" id="bm-view-service"></p>
+                                        </div>
+                                        <button type="button" id="bm-unlock" class="btn"
+                                            style="padding: 2px 8px; font-size: 12px;" hidden>Unlock to edit</button>
+                                    </div>
+                                    <p class="bm-view-contact muted" id="bm-view-contact"></p>
+                                </div>
+
+                                <div class="bm-edit-fields" id="bm-edit-fields">
+                                    <label>Customer Name <input id="bm-name" required></label>
+                                    <label>Service
+                                        <select id="bm-service" required></select>
+                                    </label>
+                                    <label>Email <input id="bm-email" type="email"></label>
+                                    <label>Phone <input id="bm-phone" type="tel"></label>
+                                </div>
+                            </div>
+
+                            <div id="bm-customer-note-group" hidden>
+                                <label>Customer Notes</label>
+                                <!-- Read-only paragraph box, not a text field — the customer's own
+                                     words shouldn't look like something staff can type into.
+                                     bm-customer-note (hidden) still carries the actual value; see
+                                     setCustomerNote() in script.js. -->
+                                <div class="bm-note-box" id="bm-customer-note-text"></div>
+                                <textarea id="bm-customer-note" hidden></textarea>
+                            </div>
+
+                            <!-- Read-only answers to the business's own custom questions (see
+                                 the Booking page editor's "Additional fields"). Historical
+                                 record, same as customer notes above — not editable here. -->
+                            <div id="bm-custom-group" hidden>
+                                <label>Additional details</label>
+                                <div class="bm-note-box" id="bm-custom-list"></div>
+                            </div>
+
+                            <div class="bm-staff-group">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+                                    <label style="margin: 0;">Staff <span class="muted"
+                                            id="bm-staff-need"></span></label>
+                                    <div style="display: flex; gap: 12px;">
+                                        <button type="button" id="bm-staff-mode-toggle" class="link"
+                                            style="font-size: 13px; margin: 0;" hidden>Switch to list</button>
+                                        <button type="button" id="bm-staff-clear" class="link"
+                                            style="font-size: 13px; margin: 0;" hidden>Clear selection</button>
+                                    </div>
+                                </div>
+                                <!-- Search is now permanently visible -->
+                                <input type="search" id="bm-staff-search" class="search-input"
+                                    placeholder="Search staff..."
+                                    style="width: 100%; margin-bottom: 8px; padding: 7px 12px; font-size: 13px;">
+
+                                <select id="bm-staff-select" hidden></select>
+                                <div id="bm-staff-list" class="bm-staff-list" hidden></div>
+
+                                <button type="button" id="bm-staff-expand" class="add-row-btn"
+                                    style="border-style: solid; padding: 6px; margin-top: 8px;" hidden>Show all</button>
+                            </div>
+
+                            <label>Company Notes <textarea id="bm-company-note" rows="2"></textarea></label>
+
+                            <div
+                                style="position: sticky; bottom: -24px; margin: 24px -24px -24px; padding: 12px 24px; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+                                <button class="cta" type="submit" id="bm-save"
+                                    style="width: auto; margin: 0; padding: 10px 24px;">Save</button>
+                                <button class="btn" type="button" id="bm-delete"
+                                    style="color: #c0392b; border-color: transparent; background: transparent; box-shadow: none; margin: 0; padding: 8px 12px;">Delete</button>
+                            </div>
+                        </form>
+                    </aside>
+                </div>
+
+            </section>
+
+            <section id="view-analytics" hidden>
+                <div class="toolbar">
+                    <h1>Analytics</h1>
+                    <div class="range-controls">
+                        <div class="preset-wrap">
+                            <button class="btn" type="button" id="range-preset-btn" aria-haspopup="true"
+                                aria-expanded="false">Presets</button>
+                            <div id="range-preset-menu" class="range-preset-menu" hidden>
+                                <button type="button" class="range-preset-option" data-preset="all">All time</button>
+                                <button type="button" class="range-preset-option" data-preset="thisWeek">This
+                                    week</button>
+                                <button type="button" class="range-preset-option" data-preset="lastWeek">Last
+                                    week</button>
+                                <button type="button" class="range-preset-option" data-preset="thisMonth">This
+                                    month</button>
+                                <button type="button" class="range-preset-option" data-preset="lastMonth">Last
+                                    month</button>
+                                <button type="button" class="range-preset-option" data-preset="thisYear">This
+                                    year</button>
+                                <button type="button" class="range-preset-option" data-preset="lastYear">Last
+                                    year</button>
+                            </div>
+                        </div>
+                        <div class="range-picker">
+                            <label class="range-picker-field">From
+                                <input type="date" id="range-start" aria-label="Range start date">
+                            </label>
+                            <label class="range-picker-field">To
+                                <input type="date" id="range-end" aria-label="Range end date">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat"><small>Bookings</small><strong id="stat-count"></strong></div>
+                    <div class="stat"><small>Revenue</small><strong id="stat-revenue"></strong></div>
+                    <div class="stat"><small>Avg bookings / day</small><strong id="stat-avg"></strong></div>
+                    <div class="stat"><small>Avg revenue / day</small><strong id="stat-avg-revenue"></strong></div>
+                    <div class="stat"><small>Most booked service</small><strong id="stat-top"></strong></div>
+                </div>
+
+                <div class="analytics-grid">
+                    <section class="chart-card">
+                        <div class="chart-card-head">
+                            <h2>Bookings over time</h2>
+                            <div class="chart-type-toggle" role="group" aria-label="Chart type">
+                                <button type="button" class="chart-type-btn" data-chart-type="line"
+                                    aria-pressed="true">Line</button>
+                                <button type="button" class="chart-type-btn" data-chart-type="bar"
+                                    aria-pressed="false">Bar</button>
+                            </div>
+                        </div>
+                        <div class="chart-wrap" id="time-chart"></div>
+                    </section>
+
+                    <section class="analytics-sidebar">
+                        <h2>Bookings by service</h2>
+                        <div id="service-breakdown"></div>
+                    </section>
+                </div>
+
+                <div class="analytics-grid insights-grid">
+                    <section>
+                        <div class="chart-card-head">
+                            <h2 id="insights-title">Top times by revenue</h2>
+                            <div class="chart-type-toggle" role="group" aria-label="Breakdown type">
+                                <button type="button" class="chart-type-btn" data-insights-tab="times"
+                                    aria-pressed="true">Times</button>
+                                <button type="button" class="chart-type-btn" data-insights-tab="employees"
+                                    aria-pressed="false">Employees</button>
+                            </div>
+                        </div>
+                        <div id="hour-breakdown" class="sb-list-wide"></div>
+                        <div id="employee-breakdown" class="sb-list-wide" hidden></div>
+                    </section>
+
+                    <section>
+                        <h2>Busiest day of week</h2>
+                        <div id="weekday-breakdown" class="sb-list-narrow"></div>
+                    </section>
+                </div>
+            </section>
+
+            <section id="view-editor" hidden>
+                <h1>Booking page</h1>
+                <p class="muted">Changes here update what customers see on the booking page right away.</p>
+                <form id="editor-form" class="editor-grid">
+                    <section class="card ed-col">
+                        <h2>Business details</h2>
+                        <div class="field-group">
+                            <label class="field"><span class="field-label">Business name</span>
+                                <input id="e-name" required></label>
+                            <label class="field"><span class="field-label">Tagline</span>
+                                <textarea id="e-tagline" rows="2"></textarea></label>
+                            <label class="field"><span class="field-label">Address</span>
+                                <input id="e-address"></label>
+                        </div>
+
+                        <!-- Opening hours lives in a floating popover (see #hours-popover
+                             below) instead of expanding inline, so opening it never
+                             resizes this card or shifts Customer details next to it. -->
+                        <div class="hours-row">
+                            <button type="button" class="hours-toggle-btn" id="hours-toggle">
+                                <span>Opening hours</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Moved Staffing toggle here -->
+                        <div style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px;">
+                            <label class="switch-row"><input type="checkbox" id="e-auto-assign"><span>Auto-assign staff
+                                    to new bookings</span></label>
+                            <p class="muted" style="margin: 0; font-size: 13px;">Off leaves new bookings unassigned
+                                until picked up on the calendar.</p>
+                        </div>
+                    </section>
+
+                    <section class="card ed-col">
+                        <h2>Customer details</h2>
+                        <p class="muted">Choose what to ask a customer for when they book, and what's required.</p>
+
+                        <div class="cfields-list">
+                            <span></span>
+                            <span class="cfields-head">Ask for it</span>
+                            <span class="cfields-head">Required</span>
+
+                            <span class="cfields-label">Full name</span>
+                            <input type="checkbox" id="e-name-enabled" aria-label="Ask for full name">
+                            <input type="checkbox" id="e-name-required" aria-label="Full name is required">
+
+                            <span class="cfields-label">Email</span>
+                            <input type="checkbox" id="e-email-enabled" aria-label="Ask for email">
+                            <input type="checkbox" id="e-email-required" aria-label="Email is required">
+
+                            <span class="cfields-label">Phone number</span>
+                            <input type="checkbox" id="e-phone-enabled" aria-label="Ask for phone number">
+                            <input type="checkbox" id="e-phone-required" aria-label="Phone number is required">
+
+                            <span class="cfields-label">Address</span>
+                            <input type="checkbox" id="e-address-enabled" aria-label="Ask for address">
+                            <input type="checkbox" id="e-address-required" aria-label="Address is required">
+                        </div>
+
+                        <div class="custom-fields-editor">
+                            <h3>Additional fields</h3>
+                            <p class="muted">Your own questions — a T-shirt size, guest count, allergies, anything
+                                else.</p>
+                            <div id="custom-field-editor-list"></div>
+                            <button class="add-row-btn" type="button" id="add-custom-field">+ Add a field</button>
+                        </div>
+                    </section>
+
+                    <section class="ed-span-full services-plain">
+                        <h2>Services</h2>
+                        <div class="service-table">
+                            <div class="service-row service-row-head" aria-hidden="true">
+                                <span>Service</span><span>Mins</span><span>Price</span><span>Description</span><span>Staff</span><span>Color</span><span></span>
+                            </div>
+                            <div id="service-editor-list"></div>
+                        </div>
+                        <button class="add-row-btn" type="button" id="add-service">+ Add a service</button>
+                    </section>
+
+                    <div class="editor-actions ed-span-full">
+                        <div class="editor-actions-buttons">
+                            <button class="link" type="button" id="reset-editor">Reset to default</button>
+                            <button class="cta" type="submit">Save changes</button>
+                        </div>
+                        <p class="muted" id="editor-msg" role="status"></p>
+                    </div>
+                </form>
+
+                <!-- Floating opening-hours panel, same anchored-popover pattern as
+                     #emp-panel-popover in the Employees tab: opening it never
+                     resizes or repositions the Business details card. -->
+                <div id="hours-popover" class="emp-panel-popover" hidden>
+                    <div class="emp-panel-popover-head">
+                        <span class="emp-panel-popover-title">Opening hours</span>
+                        <button type="button" class="emp-panel-popover-close" id="hours-popover-close"
+                            aria-label="Close">✕</button>
+                    </div>
+                    <p class="muted" style="margin: 0 0 12px;">Customers can only book inside these hours.</p>
+                    <div id="hours-editor-list"></div>
+                </div>
+            </section>
+
+
+
+            <section id="view-employees" hidden>
+                <div class="employees-topbar">
+                    <div class="employees-topbar-left">
+                        <h1>Employees</h1>
+                        <div class="search-bar employee-search-bar">
+                            <input class="search-input" type="search" id="employee-search"
+                                placeholder="Search employees…" aria-label="Search employees">
+                        </div>
+                    </div>
+                    <div class="employees-topbar-actions">
+                        <div class="view-toggle" role="group" aria-label="Employee list layout">
+                            <button class="view-toggle-btn" type="button" id="employee-view-list" aria-pressed="true"
+                                aria-label="List view" title="List view">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="4" y1="6" x2="20" y2="6"></line>
+                                    <line x1="4" y1="12" x2="20" y2="12"></line>
+                                    <line x1="4" y1="18" x2="20" y2="18"></line>
+                                </svg>
+                            </button>
+                            <button class="view-toggle-btn" type="button" id="employee-view-grid" aria-pressed="false"
+                                aria-label="Grid view" title="Grid view">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="btn" type="button" id="add-sample-employees">Add sample employees</button>
+                        <button class="btn" type="button" id="add-employee">Add an employee</button>
+                        <button class="btn" type="button" id="clear-employees"
+                            style="color: #c0392b; border-color: #c0392b;">Clear employees</button>
+                    </div>
+                </div>
+
+                <!-- Shared floating panel for Skills/Schedule/Timetable. Its
+                     content is moved in from whichever employee card's tab
+                     was clicked (see script-admin.js), so opening it never
+                     resizes or repositions any card. -->
+                <div id="emp-panel-popover" class="emp-panel-popover" hidden>
+                    <div class="emp-panel-popover-head">
+                        <span id="emp-panel-popover-title" class="emp-panel-popover-title"></span>
+                        <button type="button" class="emp-panel-popover-close" id="emp-panel-popover-close"
+                            aria-label="Close">✕</button>
+                    </div>
+                    <div id="emp-panel-popover-body"></div>
+                </div>
+
+                <form id="employees-form">
+                    <div id="employee-editor-list" class="view-list"></div>
+                    <div class="emp-save-bar">
+                        <p class="muted" id="employee-msg" role="status"></p>
+                        <button class="cta" type="submit">Save employees</button>
+                    </div>
+                </form>
+            </section>
+
+
+
+
+            <!-- Templates for repeated items. script.js clones these. -->
+            <template id="tpl-brand"><button type="button"></button></template>
+
+            <template id="tpl-cal-day">
+                <div class="cal-day">
+                    <div class="cal-day-head"><span class="cal-day-name"></span><span class="cal-day-num"></span></div>
+                    <div class="cal-bookings"></div>
+                </div>
+            </template>
+
+            <template id="tpl-cal-booking">
+                <div class="cal-booking">
+                    <span class="cb-name"></span>
+                    <button class="cb-cancel" type="button" aria-label="Cancel this booking">Cancel</button>
+                </div>
+            </template>
+
+            <template id="tpl-service-row">
+                <div class="service-row">
+                    <input class="sr-name" aria-label="Service name" placeholder="Service name">
+                    <input class="sr-mins" aria-label="Minutes" type="number" min="5" step="5" placeholder="30">
+                    <input class="sr-price" aria-label="Price" type="number" min="0" step="1" placeholder="20">
+                    <input class="sr-desc" aria-label="Description" placeholder="Short description">
+                    <input class="sr-staff" aria-label="Staff needed" type="number" min="1" step="1"
+                        title="Staff needed" placeholder="1">
+                    <input class="sr-color" aria-label="Color" type="color" title="Service color">
+                    <button class="row-remove sr-remove" type="button" aria-label="Remove this service">✕</button>
+                </div>
+            </template>
+
+            <template id="tpl-custom-field-row">
+                <div class="cf-row">
+                    <input class="cfr-label" aria-label="Field label" placeholder="Field label (e.g. Allergies)">
+                    <select class="cfr-type" aria-label="Field type">
+                        <option value="text">Short answer</option>
+                        <option value="textarea">Long answer</option>
+                    </select>
+                    <label class="switch-row cfr-required-label"><input type="checkbox"
+                            class="cfr-required"><span>Required</span></label>
+                    <button class="row-remove cfr-remove" type="button" aria-label="Remove this field">✕</button>
+                </div>
+            </template>
+
+
+            <template id="tpl-employee-card">
+                <section class="card emp-card">
+                    <div class="emp-card-head">
+                        <div class="emp-avatar" aria-hidden="true"></div>
+                        <div class="emp-title">
+                            <input class="emp-name" aria-label="Employee name" placeholder="Employee name" required>
+                            <p class="emp-meta muted"></p>
+                        </div>
+                        <input class="emp-color" type="color" aria-label="Employee colour" title="Change colour">
+                        <button class="emp-delete" type="button" aria-label="Delete employee" title="Delete employee">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                                <path d="M10 11v6"></path>
+                                <path d="M14 11v6"></path>
+                                <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="emp-tabs" role="tablist">
+                        <button class="emp-tab" type="button" data-panel="skills" aria-pressed="false">Skills</button>
+                        <button class="emp-tab" type="button" data-panel="schedule"
+                            aria-pressed="false">Schedule</button>
+                        <button class="emp-tab" type="button" data-panel="timetable"
+                            aria-pressed="false">Timetable</button>
+                    </div>
+
+                    <div class="emp-panel emp-skills" hidden></div>
+                    <div class="emp-panel emp-schedule" hidden></div>
+                    <div class="emp-panel emp-timetable" hidden></div>
+                </section>
+            </template>
+
+            <template id="tpl-skill-chip"><button type="button" class="skill-chip"
+                    aria-pressed="false"></button></template>
+
+            <template id="tpl-schedule-day">
+                <div class="schedule-day">
+                    <div class="sched-check-wrap">
+                        <input type="checkbox" class="sched-working" aria-label="Toggle working day">
+                        <span class="sched-day-label"></span>
+                    </div>
+
+                    <div class="sched-times">
+                        <input type="time" class="sched-start" aria-label="Start time">
+                        <span class="muted sched-to">to</span>
+                        <input type="time" class="sched-end" aria-label="End time">
+                    </div>
+
+                    <button type="button" class="sched-copy-btn" aria-label="Apply to all working days"
+                        title="Apply to all working days">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+
+                    <span class="muted sched-off">Not working</span>
+                </div>
+            </template>
+
+            <template id="tpl-staff-check">
+                <label class="bm-staff-item">
+                    <input type="checkbox" class="bm-staff-check">
+                    <span class="bm-staff-name"></span>
+                    <span class="bm-staff-tag"></span>
+                </label>
+            </template>
+
+            <script src="../shared.js"></script>
+            <script src="script-admin.js"></script>
+
+            <div id="toast" class="toast" role="status" aria-live="polite"><span class="toast-text"></span></div>
+</body>
+
+</html>
