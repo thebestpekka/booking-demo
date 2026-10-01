@@ -9,7 +9,10 @@
     --on-brand: #fff;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px)
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    -webkit-text-size-adjust: 100%
 }
 
 html {
@@ -50,6 +53,9 @@ html {
 
 body {
     margin: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
     background: var(--bg);
     color: var(--text);
     font: 16px/1.5 Figtree, system-ui, sans-serif
@@ -71,7 +77,8 @@ button,
 input,
 textarea {
     font: inherit;
-    color: inherit
+    color: inherit;
+    touch-action: manipulation
 }
 
 [hidden] {
@@ -147,10 +154,15 @@ header.biz p {
 
 main.wrap {
     display: grid;
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: minmax(0, 1fr) 300px;
     gap: 24px;
     padding: 24px 16px 56px;
     align-items: start
+}
+
+main.wrap>div,
+aside.card {
+    min-width: 0
 }
 
 section.card,
@@ -406,15 +418,107 @@ textarea:focus-visible {
 
 @media (max-width:760px) {
     main.wrap {
-        grid-template-columns: 1fr
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+        padding: 16px 12px 40px
     }
 
     aside.card {
         position: static
     }
 
+    /* demo bar: switcher gets its own row, admin button full width */
+    .demo {
+        padding: 10px 12px;
+        gap: 8px
+    }
+
+    .demo .sw {
+        width: 100%
+    }
+
+    .demo button,
+    .demo .admin-btn {
+        padding: 7px 14px;
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center
+    }
+
+    .demo .admin-btn {
+        margin-left: 0
+    }
+
+    header.biz {
+        padding: 24px 12px 28px
+    }
+
+    section.card,
+    aside.card {
+        padding: 16px;
+        border-radius: 10px
+    }
+
+    h2 {
+        font-size: 18px
+    }
+
+    /* bigger touch targets */
+    .svc {
+        padding: 14px;
+        min-height: 56px
+    }
+
+    .week-nav-btn {
+        width: 44px;
+        height: 44px
+    }
+
+    .week-range {
+        font-size: 13px
+    }
+
+    /* all 8 days visible at once: 4 x 2 grid, no sideways scroll */
+    .days {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        overflow: visible;
+        padding-bottom: 0
+    }
+
+    .day {
+        flex: none;
+        min-height: 56px
+    }
+
+    .slots {
+        grid-template-columns: repeat(3, minmax(0, 1fr))
+    }
+
+    .slot {
+        padding: 12px 0
+    }
+
+    .row {
+        gap: 0
+    }
+
     .row label {
         flex-basis: 100%
+    }
+
+    .cta {
+        padding: 15px
+    }
+
+    .done {
+        padding: 28px 16px
+    }
+}
+
+@media (max-width:360px) {
+    .slots {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
     }
 }
 
