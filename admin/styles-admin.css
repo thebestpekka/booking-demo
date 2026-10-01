@@ -2675,3 +2675,299 @@
     padding: 0;
     pointer-events: none;
 }
+
+/* ==========================================================================
+   MOBILE LAYOUT
+   Everything below is additive: the desktop rules above are untouched, and
+   the small "base" rules here are inert on desktop.
+   ========================================================================== */
+
+/* Calendar heading block (was an inline margin-left: 30px) */
+.cal-head { margin-left: 30px; }
+
+/* Service rows: each input now sits in a labelled wrapper. On desktop the
+   caption is hidden (the column header row above does that job) and the
+   wrapper is just a plain grid cell, so the desktop table looks the same. */
+.sr-field { display: block; margin: 0; min-width: 0; font-weight: 400; }
+.sr-cap { display: none; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+
+/* ---------- Tablet and below: the calendar ---------- */
+@media (max-width: 850px) {
+    /* align-items:flex-start in a column layout sized the calendar to its
+       full ~1180px content width and pushed the whole page sideways. */
+    .calendar-layout { align-items: stretch; }
+    .calendar-layout .calendar-nav-wrap { width: 100%; }
+
+    .calendar {
+        grid-template-columns: 52px repeat(8, minmax(108px, 1fr));
+        /* The 1px "gap" lines were painted by the scroller's background,
+           so they stayed put while the days scrolled past. A real border
+           on each cell scrolls with its column instead. */
+        column-gap: 0;
+        overscroll-behavior-x: contain;
+    }
+    .calendar > * { border-left: 1px solid var(--line); }
+
+    /* Keep the time labels pinned while you swipe through the days. */
+    .calendar > .cal-time,
+    .calendar > .cal-header:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 4;
+        border-left: 0;
+        border-right: 1px solid var(--line);
+    }
+    .cal-time { padding-right: 6px; font-size: 10px; }
+    .cal-booking-grid { padding: 4px 6px; }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 760px) {
+
+    /* Demo bar: tools in a tidy 2-column grid instead of a ragged wrap */
+    .demo-tools {
+        width: 100%;
+        margin-left: 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .demo-tools .btn,
+    .demo-tools .admin-btn {
+        justify-content: center;
+        text-align: center;
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 14px;
+        margin-left: 0;
+    }
+
+    /* Shell + navigation: 4 equal tabs under the business name */
+    .admin-shell { grid-template-columns: minmax(0, 1fr); max-width: 100%; }
+    .admin-nav {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        padding: 12px;
+    }
+    .admin-nav strong { grid-column: 1 / -1; margin: 0 0 4px; padding: 0 4px; font-size: 18px; }
+    .nav-btn {
+        display: grid;
+        place-items: center;
+        text-align: center;
+        min-height: 44px;
+        padding: 8px 4px;
+        font-size: 13px;
+        line-height: 1.2;
+        background: var(--bg);
+    }
+    .nav-btn[aria-pressed=true] { background: var(--brand); }
+
+    .admin-main { padding: 16px 12px 40px; min-width: 0; }
+    .admin-main h1 { font-size: 23px; }
+    .btn { min-height: 40px; }
+
+    /* ----- Calendar page ----- */
+    .cal-head { margin-left: 0; }
+    .calendar-week-label { margin-bottom: 12px; }
+    .calendar-toolbar { gap: 10px; }
+    .search-bar,
+    .cal-search-bar { flex: 1 1 100%; width: 100%; min-width: 0; }
+    .search-input { min-height: 44px; }
+    #search-options-btn { min-height: 44px; padding: 8px 14px; }
+    #search-match-count:empty { display: none; }
+    #search-match-count { flex: 0 0 100%; order: 5; margin: 0; }
+    /* This used to be forced to 100% of the tiny "Fields" button's width. */
+    .search-options-menu { left: auto; right: 0; width: min(240px, calc(100vw - 32px)); }
+
+    .calendar-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    #color-mode,
+    #auto-assign { width: 100%; min-height: 44px; }
+    .legend-box { width: 100%; }
+    .cal-legend { gap: 8px 16px; }
+
+    /* Booking details: a full-screen sheet instead of a panel buried
+       underneath a very tall calendar. */
+    #booking-modal {
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: 950;
+        width: 100%;
+        height: auto;
+        max-height: none;
+        border-radius: 0;
+        padding-top: calc(20px + env(safe-area-inset-top, 0px));
+        overscroll-behavior: contain;
+    }
+    #bm-close { width: 40px; height: 40px; }
+    #bm-staff-search { font-size: 16px !important; min-height: 44px; }
+
+    /* Floating panels become bottom sheets. JS positions these with inline
+       top/left (desktop anchoring), hence the !important. */
+    .emp-panel-popover,
+    #hours-popover,
+    .emp-panel-popover[data-kind="schedule"],
+    .emp-panel-popover[data-kind="timetable"] {
+        position: fixed !important;
+        top: auto !important;
+        left: 8px !important;
+        right: 8px !important;
+        bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+        width: auto !important;
+        max-width: none !important;
+        max-height: 78dvh;
+        z-index: 960;
+    }
+    #quick-color-menu {
+        position: fixed !important;
+        top: auto !important;
+        left: 12px !important;
+        right: 12px !important;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+        width: auto;
+        max-width: none;
+        max-height: 70dvh;
+        overflow: auto;
+        z-index: 960;
+    }
+    .emp-panel-popover-close { width: 40px; height: 40px; }
+    .schedule-day input[type="time"] { font-size: 16px; }
+
+    /* ----- Analytics ----- */
+    #view-analytics .toolbar { flex-direction: column; align-items: stretch; }
+    .range-controls { width: 100%; }
+    .preset-wrap { flex: 1 1 100%; }
+    #range-preset-btn { width: 100%; min-height: 44px; }
+    .range-preset-menu { left: 0; right: 0; width: auto; }
+    .range-picker {
+        flex: 1 1 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .range-picker-field { min-width: 0; padding: 8px 12px; }
+    .range-picker-field input[type="date"] { min-width: 0; width: 100%; font-size: 14px; }
+
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .stat { padding: 14px; }
+    .stat strong { font-size: 22px; overflow-wrap: anywhere; }
+    .stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+    .analytics-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .insights-grid { margin-top: 28px; }
+    .chart-wrap { height: 240px; }
+    .chart-card-head { flex-wrap: wrap; }
+
+    /* Breakdown rows: name + count + revenue on top, bar underneath, rather
+       than four columns squeezed into one line. */
+    .sb-row,
+    .analytics-sidebar .sb-row,
+    .sb-list-wide .sb-row,
+    .sb-list-narrow .sb-row {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-areas: "name count rev" "bar bar bar";
+        gap: 6px 12px;
+        padding: 12px 0;
+    }
+    .sb-name { grid-area: name; }
+    .sb-count { grid-area: count; }
+    .sb-revenue { grid-area: rev; min-width: 56px; }
+    .sb-bar-track { grid-area: bar; }
+    #service-breakdown { height: auto; justify-content: flex-start; gap: 0; }
+
+    /* ----- Booking page editor ----- */
+    #view-editor .editor-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    #view-editor .card { padding: 16px; }
+    #view-editor .hours-toggle-btn { min-height: 44px; }
+
+    /* Customer details: label | Ask for it | Required, switches centred
+       under their headings instead of drifting left. */
+    .cfields-list {
+        grid-template-columns: minmax(0, 1fr) 76px 76px;
+        column-gap: 8px;
+        row-gap: 16px;
+    }
+    .cfields-head { text-align: center; }
+    #view-editor .cfields-list input[type="checkbox"] { justify-self: center; }
+
+    /* Additional fields: label on its own full-width line, then
+       type | required | remove underneath. */
+    .cf-row {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 10px;
+        padding: 12px 0;
+    }
+    .cf-row .cfr-label { grid-column: 1 / -1; }
+    .cf-row select.cfr-type {
+        width: 100%;
+        min-height: 44px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        font: inherit;
+        color: inherit;
+    }
+    .cfr-required-label { white-space: nowrap; }
+    .row-remove { width: 40px; height: 40px; }
+    .add-row-btn { min-height: 44px; }
+
+    /* Services: one clearly-labelled block per service.
+         [ Service name ........................ ] [x]
+         [ Description ............................... ]
+         [ Mins ] [ Price £ ] [ Staff ] [ Colour ]       */
+    .service-row-head { display: none; }
+    .service-row {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        align-items: end;
+        padding: 16px 0;
+    }
+    .sr-cap { display: block; }
+    .service-row .sr-f-name  { grid-column: 1 / 4; grid-row: 1; }
+    .service-row .sr-remove  { grid-column: 4; grid-row: 1; justify-self: end; align-self: end; width: 44px; height: 44px; }
+    .service-row .sr-f-desc  { grid-column: 1 / -1; grid-row: 2; }
+    .service-row .sr-f-mins  { grid-column: 1; grid-row: 3; }
+    .service-row .sr-f-price { grid-column: 2; grid-row: 3; }
+    .service-row .sr-f-staff { grid-column: 3; grid-row: 3; }
+    .service-row .sr-f-color { grid-column: 4; grid-row: 3; }
+    .service-row input[type="color"] { width: 44px; height: 44px; }
+
+    /* Save bar: full-width button, Reset underneath */
+    .editor-actions {
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+        border-radius: 0;
+    }
+    .editor-actions-buttons { flex-direction: column-reverse; align-items: stretch; gap: 4px; }
+    .editor-actions .cta { width: 100%; }
+    .editor-actions .link { text-align: center; padding: 10px; }
+
+    /* ----- Employees ----- */
+    .employees-topbar { gap: 10px; }
+    .employees-topbar-left { flex: 1 1 100%; gap: 10px; }
+    .employee-search-bar { flex: 1 1 100%; max-width: none; min-width: 0; }
+    .employees-topbar-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .employees-topbar-actions .view-toggle { grid-column: 1 / -1; justify-self: start; }
+    .employees-topbar-actions .btn { min-height: 44px; padding: 8px 10px; }
+    #clear-employees { grid-column: 1 / -1; }
+
+    #employee-editor-list.view-grid { grid-template-columns: minmax(0, 1fr); }
+    #employee-editor-list { padding-bottom: 150px; }
+    .emp-tab { flex: 1 1 0; min-height: 44px; padding: 8px; text-align: center; }
+    .emp-delete { width: 40px; height: 40px; }
+    .emp-color { width: 32px; height: 32px; }
+    .emp-save-bar { padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)); }
+
+    /* Keep the toast clear of the pinned save bars */
+    .toast { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+}

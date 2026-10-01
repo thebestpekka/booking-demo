@@ -37,7 +37,7 @@
         <main class="admin-main">
 
             <section id="view-calendar">
-                <div style="margin-left: 30px;">
+                <div class="cal-head">
 
 
                     <div class="toolbar" style="margin-bottom: 0px;">
@@ -510,13 +510,19 @@
 
             <template id="tpl-service-row">
                 <div class="service-row">
-                    <input class="sr-name" aria-label="Service name" placeholder="Service name">
-                    <input class="sr-mins" aria-label="Minutes" type="number" min="5" step="5" placeholder="30">
-                    <input class="sr-price" aria-label="Price" type="number" min="0" step="1" placeholder="20">
-                    <input class="sr-desc" aria-label="Description" placeholder="Short description">
-                    <input class="sr-staff" aria-label="Staff needed" type="number" min="1" step="1"
-                        title="Staff needed" placeholder="1">
-                    <input class="sr-color" aria-label="Color" type="color" title="Service color">
+                    <label class="sr-field sr-f-name"><span class="sr-cap">Service</span>
+                        <input class="sr-name" aria-label="Service name" placeholder="Service name"></label>
+                    <label class="sr-field sr-f-mins"><span class="sr-cap">Mins</span>
+                        <input class="sr-mins" aria-label="Minutes" type="number" min="5" step="5" placeholder="30"></label>
+                    <label class="sr-field sr-f-price"><span class="sr-cap">Price £</span>
+                        <input class="sr-price" aria-label="Price" type="number" min="0" step="1" placeholder="20"></label>
+                    <label class="sr-field sr-f-desc"><span class="sr-cap">Description</span>
+                        <input class="sr-desc" aria-label="Description" placeholder="Short description"></label>
+                    <label class="sr-field sr-f-staff"><span class="sr-cap">Staff</span>
+                        <input class="sr-staff" aria-label="Staff needed" type="number" min="1" step="1"
+                            title="Staff needed" placeholder="1"></label>
+                    <label class="sr-field sr-f-color"><span class="sr-cap">Colour</span>
+                        <input class="sr-color" aria-label="Color" type="color" title="Service color"></label>
                     <button class="row-remove sr-remove" type="button" aria-label="Remove this service">✕</button>
                 </div>
             </template>
